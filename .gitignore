@@ -1,0 +1,101 @@
+# =============================================================================
+#  Virtual Queue — Root .gitignore
+# =============================================================================
+
+# ── Environment & Secrets ────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ── Node.js / npm ────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+.pnpm-store/
+
+# ── Build Output ─────────────────────────────────────────────────────────────
+dist/
+build/
+out/
+.next/
+.nuxt/
+.vite/
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+*.log.*
+
+# ── Runtime / Temp ───────────────────────────────────────────────────────────
+tmp/
+temp/
+.tmp/
+*.tmp
+*.temp
+*.pid
+*.seed
+*.pid.lock
+
+# ── Testing ──────────────────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+junit.xml
+test-results/
+
+# ── OS Generated ─────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── IDEs & Editors ───────────────────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ── Redis / BullMQ ───────────────────────────────────────────────────────────
+dump.rdb
+appendonly.aof
+
+# ── MongoDB (local dumps) ────────────────────────────────────────────────────
+*.bson
+*.mongodump/
+mongodump/
+
+# ── Winston / Morgan log files ───────────────────────────────────────────────
+combined.log
+error.log
+app.log
+http.log
+
+# ── QR / Media ───────────────────────────────────────────────────────────────
+*.qr.png
+uploads/
+
+# ── Misc ─────────────────────────────────────────────────────────────────────
+.cache/
+.parcel-cache/
+.turbo/
+*.tsbuildinfo

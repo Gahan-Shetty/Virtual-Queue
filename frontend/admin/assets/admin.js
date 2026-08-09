@@ -203,6 +203,21 @@ if (statTotal) {
 
   loadStats();
   loadConfig();
+
+  // Real-time: Live Socket.IO listener for dashboard stats updates
+  if (typeof io !== 'undefined' && token) {
+    try {
+      const socket = io('http://localhost:5000/admin', {
+        auth: { token }
+      });
+      socket.on('admin:stats_updated', () => loadStats());
+      socket.on('admin:config_updated', () => loadConfig());
+      socket.on('admin:token_allocated', () => loadStats());
+      socket.on('admin:token_expired', () => loadStats());
+    } catch (err) {
+      console.error('Admin socket connection error:', err);
+    }
+  }
 }
 
 // ── Services Logic ────────────────────────────────────────────────────────

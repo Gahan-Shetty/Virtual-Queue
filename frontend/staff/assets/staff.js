@@ -18,11 +18,14 @@ if (document.getElementById('logoutBtn')) {
   });
   
   if (user) {
-    document.getElementById('staffInfo').innerHTML = `
-      <strong>${user.name}</strong><br>
-      ${user.role}<br>
-      <span style="opacity:0.7">Org: ${user.orgId}</span>
-    `;
+    const staffInfo = document.getElementById('staffInfo');
+    if (staffInfo) {
+      staffInfo.innerHTML = `
+        <strong>${user.name}</strong><br>
+        ${user.role}<br>
+        <span style="opacity:0.7">Org: ${user.orgId}</span>
+      `;
+    }
     
     // Show receptionist-only tabs
     if (user.role === 'RECEPTIONIST' || user.role === 'ADMIN') {

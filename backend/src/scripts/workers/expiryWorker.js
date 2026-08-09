@@ -86,6 +86,10 @@ const processSweep = async () => {
         }
       );
 
+      // Notify admin dashboard.
+      const { emitToAdmin } = require('../../config/socket');
+      emitToAdmin(fresh.orgId.toString(), 'admin:stats_updated', { tokenId: fresh._id });
+
       logger.info(
         `Expired: token ${fresh._id} (${fresh.tokenNumber})`
       );

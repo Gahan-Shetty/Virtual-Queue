@@ -60,7 +60,10 @@ const init = (httpServer) => {
     const { id, role, orgId, serviceId } = socket.user;
     logger.info(`[socket /staff] connected: ${id} (${role})`);
 
-    // Staff joins org+service room to receive queue events
+    // Staff joins org room so they get all queue updates for their org
+    if (orgId) {
+      socket.join(`org:${orgId}`);
+    }
     if (orgId && serviceId) {
       socket.join(`queue:${orgId}:${serviceId}`);
     }
@@ -77,7 +80,9 @@ const init = (httpServer) => {
   adminNS.use(authMiddleware);
   adminNS.on('connection', (socket) => {
     logger.info(`[socket /admin] connected: ${socket.user.id}`);
-    socket.join(`admin:${socket.user.orgId}`);
+    if (socket.user.orgId) {
+      socket.join(`admin:${socket.user.orgId}`);
+    }
     socket.emit('connected', { userId: socket.user.id, timestamp: new Date().toISOString() });
 
     socket.on('disconnect', () => {
@@ -99,6 +104,9 @@ const emitToPatient = (userId, event, data) => {
 const emitToQueue = (orgId, serviceId, event, data) => {
   if (!io) return;
   io.of('/staff').to(`queue:${orgId}:${serviceId}`).emit(event, data);
+  io.of('/staff').to(`org:${orgId}`).emit(event, data);
+  // Also notify admins of stats update
+  io.of('/admin').to(`admin:${orgId}`).emit('admin:stats_updated', data);
 };
 
 /** Emit to all admins of an org */

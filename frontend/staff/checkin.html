@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Check-in - Staff Portal</title>
+  <link rel="stylesheet" href="assets/staff.css">
+  <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <h2>Virtual Queue</h2>
+      <a href="console.html" class="nav-item">Queue Console</a>
+      <a href="walkin.html" class="nav-item">New Walk-in</a>
+      <a href="checkin.html" class="nav-item active">QR Check-in</a>
+      <div style="flex:1;"></div>
+      <button class="btn btn-outline" id="logoutBtn" style="width: 100%;">Logout</button>
+    </aside>
+
+    <main class="main-content">
+      <header class="header">
+        <h3>Patient Check-in</h3>
+      </header>
+      
+      <div class="content-area grid-2">
+        <!-- QR Scanner -->
+        <div class="panel text-center">
+          <h4 style="margin-bottom: 1rem;">Scan Patient QR Code</h4>
+          <div style="background:#000; width:100%; max-width:400px; margin:0 auto; aspect-ratio:4/3; position:relative;">
+            <video id="video" style="width:100%; height:100%; object-fit:cover;"></video>
+            <canvas id="canvas" hidden></canvas>
+          </div>
+          <p class="text-muted mt-4">Position the QR code within the frame to automatically scan.</p>
+        </div>
+
+        <!-- Manual fallback -->
+        <div class="panel">
+          <h4 style="margin-bottom: 1rem;">Manual Check-in</h4>
+          <form id="manualCheckinForm">
+            <div class="form-group">
+              <label>Service</label>
+              <select id="serviceSelect" required></select>
+            </div>
+            <div class="form-group">
+              <label>Token Number</label>
+              <input type="text" id="tokenNumber" required placeholder="e.g. OPD001" style="text-transform: uppercase;">
+            </div>
+            <div id="checkinStatus" style="margin-bottom: 1rem; font-weight: 500;"></div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Check In</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/staff.js"></script>
+</body>
+</html>

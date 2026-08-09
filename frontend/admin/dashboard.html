@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Admin Portal</title>
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <h2>Virtual Queue Admin</h2>
+      <a href="dashboard.html" class="nav-item active">Dashboard</a>
+      <a href="services.html" class="nav-item">Services & Counters</a>
+      <div style="flex:1;"></div>
+      <div id="adminInfo" style="margin-bottom: 1rem; font-size: 0.875rem; color: #a5b4fc;"></div>
+      <button class="btn btn-primary" id="logoutBtn" style="width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">Logout</button>
+    </aside>
+
+    <main class="main-content">
+      <header class="header">
+        Today's Overview
+      </header>
+      
+      <div class="content-area">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Total Tokens</h3>
+            <div class="value" id="statTotal">--</div>
+          </div>
+          <div class="stat-card">
+            <h3>Completed</h3>
+            <div class="value" id="statCompleted" style="color: #16a34a;">--</div>
+          </div>
+          <div class="stat-card">
+            <h3>Waiting</h3>
+            <div class="value" id="statWaiting" style="color: #ca8a04;">--</div>
+          </div>
+          <div class="stat-card">
+            <h3>No-Shows / Expired</h3>
+            <div class="value" id="statMissed" style="color: #dc2626;">--</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3 style="margin-bottom: 1rem;">System Configuration</h3>
+          <form id="configForm">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Booking Open Time</label>
+                <input type="time" id="cfgBookingOpen">
+              </div>
+              <div class="form-group">
+                <label>Booking Close Time</label>
+                <input type="time" id="cfgBookingClose">
+              </div>
+              <div class="form-group">
+                <label>Service Start Time</label>
+                <input type="time" id="cfgServiceStart">
+              </div>
+              <div class="form-group">
+                <label>Service End Time</label>
+                <input type="time" id="cfgServiceEnd">
+              </div>
+              <div class="form-group">
+                <label>Reservation Expiry (mins)</label>
+                <input type="number" id="cfgExpiryMins">
+              </div>
+            </div>
+            <div id="cfgMsg" style="margin: 1rem 0; font-weight: 500;"></div>
+            <button type="submit" class="btn btn-primary">Save Configuration</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services - Admin Portal</title>
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <h2>Virtual Queue Admin</h2>
+      <a href="dashboard.html" class="nav-item">Dashboard</a>
+      <a href="services.html" class="nav-item active">Services & Counters</a>
+      <div style="flex:1;"></div>
+      <button class="btn btn-primary" id="logoutBtn" style="width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">Logout</button>
+    </aside>
+
+    <main class="main-content">
+      <header class="header">
+        Manage Services
+      </header>
+      
+      <div class="content-area">
+        <div class="panel">
+          <h3 style="margin-bottom: 1rem;">Active Services</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Service Name</th>
+                <th>Avg Wait (m)</th>
+                <th>Daily Cap</th>
+                <th>Prefix</th>
+              </tr>
+            </thead>
+            <tbody id="servicesTableBody">
+              <tr><td colspan="4" style="text-align:center;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel" style="max-width: 600px;">
+          <h3 style="margin-bottom: 1rem;">Add New Service</h3>
+          <form id="addServiceForm">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="svcName" required>
+              </div>
+              <div class="form-group">
+                <label>Token Prefix</label>
+                <input type="text" id="svcPrefix" required placeholder="e.g. OPD" maxlength="5" style="text-transform:uppercase;">
+              </div>
+              <div class="form-group">
+                <label>Avg Service Time (mins)</label>
+                <input type="number" id="svcTime" required min="1">
+              </div>
+              <div class="form-group">
+                <label>Daily Capacity</label>
+                <input type="number" id="svcCap" required min="1">
+              </div>
+            </div>
+            <div id="svcMsg" style="margin-bottom: 1rem; font-weight: 500;"></div>
+            <button type="submit" class="btn btn-primary">Create Service</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/admin.js"></script>
+</body>
+</html>

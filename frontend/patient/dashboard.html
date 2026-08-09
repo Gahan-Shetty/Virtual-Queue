@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Patient Portal</title>
+  <link rel="stylesheet" href="assets/patient.css">
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 class="display-title">Your Token</h1>
+      <p class="text-muted" id="patientName">Welcome</p>
+    </header>
+
+    <!-- State 1: No active token -->
+    <div class="card text-center" id="noTokenState" style="display: none;">
+      <h3>No Active Reservation</h3>
+      <p class="text-muted mb-4">You do not have a token for today.</p>
+      <a href="request.html"><button>Request a Token</button></a>
+    </div>
+
+    <!-- State 2: Active token -->
+    <div class="card" id="activeTokenState" style="display: none;">
+      <div class="token-display">
+        <span class="status-badge" id="tokenStatus">Loading...</span>
+        <div class="token-number" id="tokenNumber">---</div>
+        <p class="text-muted" id="serviceName">---</p>
+      </div>
+
+      <div class="qr-container" id="qrContainer" style="display: none;">
+        <img id="qrCode" src="" alt="Check-in QR Code">
+        <p class="text-sm text-muted text-center mt-4">Show this to staff to check in</p>
+      </div>
+
+      <div class="queue-info">
+        <div class="stat-box">
+          <div class="stat-value" id="queuePosition">--</div>
+          <div class="stat-label">Position</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="estWait">-- min</div>
+          <div class="stat-label">Est. Wait</div>
+        </div>
+      </div>
+      
+      <p id="systemMessage" class="text-center mt-4" style="color: var(--status-waiting); font-weight: 500;"></p>
+
+      <button id="cancelBtn" class="btn-secondary mt-4">Cancel Reservation</button>
+    </div>
+  </div>
+
+  <script src="assets/patient.js"></script>
+</body>
+</html>

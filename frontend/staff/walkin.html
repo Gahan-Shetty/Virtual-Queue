@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Walk-in - Staff Portal</title>
+  <link rel="stylesheet" href="assets/staff.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <h2>Virtual Queue</h2>
+      <a href="console.html" class="nav-item">Queue Console</a>
+      <a href="walkin.html" class="nav-item active">New Walk-in</a>
+      <a href="checkin.html" class="nav-item">QR Check-in</a>
+      <div style="flex:1;"></div>
+      <button class="btn btn-outline" id="logoutBtn" style="width: 100%;">Logout</button>
+    </aside>
+
+    <main class="main-content">
+      <header class="header">
+        <h3>Create Walk-in Token</h3>
+      </header>
+      
+      <div class="content-area">
+        <div class="panel" style="max-width: 500px;">
+          <form id="walkinForm">
+            <div class="form-group">
+              <label>Service</label>
+              <select id="serviceSelect" required>
+                <option value="">Select Service...</option>
+              </select>
+            </div>
+            
+            <hr style="border:0; border-top:1px solid var(--border-color); margin:1.5rem 0;">
+            
+            <!-- In a real system you'd search for existing patients. We'll simplify to just creating the user/token -->
+            <h4>Patient Details</h4>
+            <div class="form-group" style="margin-top:1rem;">
+              <label>Name</label>
+              <input type="text" id="patientName" required>
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" id="patientPhone" required>
+            </div>
+            <div class="form-group">
+              <label>Email (Optional)</label>
+              <input type="email" id="patientEmail">
+            </div>
+
+            <div id="errorMsg" style="color: red; margin-bottom: 1rem; display: none;"></div>
+            <div id="successMsg" style="color: green; margin-bottom: 1rem; display: none;"></div>
+            
+            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:1rem;">Create & Print Token</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/staff.js"></script>
+</body>
+</html>

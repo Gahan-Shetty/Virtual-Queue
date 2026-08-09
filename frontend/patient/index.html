@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Patient Portal</title>
+  <link rel="stylesheet" href="assets/patient.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 class="display-title">Virtual Queue</h1>
+      <p class="text-muted">Sign in to manage your appointments</p>
+    </header>
+
+    <div class="card" id="loginCard">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="orgSlug">Organization Code</label>
+          <input type="text" id="orgSlug" required placeholder="e.g., city-hospital">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required>
+        </div>
+        <p id="loginError" class="error-text"></p>
+        <button type="submit" class="mt-4">Sign In</button>
+      </form>
+      <p class="text-center mt-4 text-sm">
+        Don't have an account? <a href="#" id="showRegister" style="color: var(--accent-color); text-decoration: none;">Register here</a>
+      </p>
+    </div>
+
+    <div class="card" id="registerCard" style="display: none;">
+      <h2>Register</h2>
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="regOrgSlug">Organization Code</label>
+          <input type="text" id="regOrgSlug" required>
+        </div>
+        <div class="form-group">
+          <label for="regName">Full Name</label>
+          <input type="text" id="regName" required>
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email</label>
+          <input type="email" id="regEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="regPhone">Phone Number</label>
+          <input type="tel" id="regPhone" required>
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <input type="password" id="regPassword" required minlength="8">
+        </div>
+        <p id="registerError" class="error-text"></p>
+        <button type="submit" class="mt-4">Create Account</button>
+      </form>
+      <p class="text-center mt-4 text-sm">
+        Already have an account? <a href="#" id="showLogin" style="color: var(--accent-color); text-decoration: none;">Sign in</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="assets/patient.js"></script>
+</body>
+</html>

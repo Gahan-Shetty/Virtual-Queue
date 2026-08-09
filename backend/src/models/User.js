@@ -100,9 +100,8 @@ userSchema.statics.hashPassword = async (plain) => {
 
 // ── Pre-save ──────────────────────────────────────────────────────────────
 
-userSchema.pre('save', async function (next) {
-  // passwordHash is set explicitly; no auto-hash hook to avoid double-hashing
-  next();
+userSchema.pre('save', function () {
+  // passwordHash is set explicitly; no auto-hash hook needed
 });
 
 // ── Indexes ───────────────────────────────────────────────────────────────

@@ -55,8 +55,8 @@ const sendOtp = async (req, res, next) => {
 const verifyOtp = async (req, res, next) => {
   try {
     const { otp, via } = req.body;
-    await authService.verifyAccountOtp(req.user.id, otp, via);
-    return response.success(res, null, 'Account verified successfully');
+    const result = await authService.verifyAccountOtp(req.user.id, otp, via);
+    return response.success(res, result, 'Account verified successfully');
   } catch (err) {
     next(err);
   }

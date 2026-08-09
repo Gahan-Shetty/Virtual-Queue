@@ -149,11 +149,26 @@ const sendVerificationOtp = async (userId, via = 'email') => {
   const identifier = via === 'phone' ? user.phone : user.email;
   const otp = await generateOtp(identifier, 'verify');
 
-  // In production: send via SMTP/SMS. For now, log it (stub).
-  logger.info(`[OTP STUB] ${via.toUpperCase()} OTP for ${identifier}: ${otp}`);
+  logger.info(`[OTP GENERATED] ${via.toUpperCase()} OTP for ${identifier}: ${otp}`);
 
-  // TODO: replace stub with real email/SMS delivery
-  // await emailService.sendOtp(user.email, otp);
+  const { sendEmail, sendSMS } = require('../notification/notification.service');
+  if (via === 'email' && user.email) {
+    await sendEmail({
+      to: user.email,
+      subject: 'Account Verification OTP Code',
+      text: `Your verification OTP code is ${otp}. It expires in 10 minutes.`,
+      html: `<div style="font-family: sans-serif; padding: 20px;">
+        <h2>Account Verification</h2>
+        <p>Your verification OTP code is: <strong style="font-size: 24px; color: #0ea5e9;">${otp}</strong></p>
+        <p>This code is valid for 10 minutes.</p>
+      </div>`,
+    });
+  } else if (via === 'phone' && user.phone) {
+    await sendSMS({
+      to: user.phone,
+      body: `Your verification OTP is ${otp}. Valid for 10 minutes.`,
+    });
+  }
 };
 
 const verifyAccountOtp = async (userId, otp, via = 'email') => {
@@ -164,8 +179,14 @@ const verifyAccountOtp = async (userId, otp, via = 'email') => {
   const { valid, reason } = await verifyOtpUtil(identifier, otp, 'verify');
   if (!valid) throw new AppError(reason, 400);
 
-  await User.findByIdAndUpdate(userId, { isVerified: true });
+  const updatedUser = await User.findByIdAndUpdate(userId, { isVerified: true }, { new: true });
   logger.info(`Account verified: ${userId} via ${via}`);
+
+  // Reissue fresh accessToken with updated payload (isVerified: true)
+  const payload = buildTokenPayload(updatedUser);
+  const newAccessToken = generateAccessToken(payload);
+
+  return { user: updatedUser.toSafeObject(), accessToken: newAccessToken };
 };
 
 const getProfile = async (userId) => {

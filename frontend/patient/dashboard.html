@@ -14,6 +14,37 @@
       <p class="text-muted" id="patientName">Welcome</p>
     </header>
 
+    <!-- State 0: Account Verification Needed -->
+    <div class="card" id="verifyAccountCard" style="display: none;">
+      <h3 class="text-center" style="margin-bottom: 0.5rem;">Verify Your Account</h3>
+      <p class="text-muted text-center mb-4">Please verify your account to start managing and requesting tokens.</p>
+
+      <div id="otpSendStep">
+        <div class="form-group">
+          <label for="otpViaSelect">Send Verification Code Via</label>
+          <select id="otpViaSelect">
+            <option value="email">Email OTP</option>
+            <option value="phone">SMS / Phone OTP</option>
+          </select>
+        </div>
+        <p id="otpSendMsg" class="text-center text-sm mb-4" style="display: none; font-weight: 500;"></p>
+        <button id="sendOtpBtn" type="button" class="mt-2">Send OTP</button>
+      </div>
+
+      <div id="otpVerifyStep" style="display: none; margin-top: 1.5rem;">
+        <div class="form-group">
+          <label for="otpCodeInput">Enter 6-Digit OTP Code</label>
+          <input type="text" id="otpCodeInput" placeholder="123456" maxlength="6" style="text-align: center; font-size: 1.25rem; letter-spacing: 0.25em;">
+        </div>
+        <p id="otpVerifyError" class="error-text"></p>
+        <p id="otpVerifySuccess" class="text-center text-sm mb-4" style="display: none; color: var(--status-called); font-weight: 500;"></p>
+        <button id="verifyOtpBtn" type="button" class="mt-2">Verify Account</button>
+        <p class="text-center mt-4 text-sm">
+          Didn't receive code? <a href="#" id="resendOtpLink" style="color: var(--accent-color); text-decoration: none;">Resend OTP</a>
+        </p>
+      </div>
+    </div>
+
     <!-- State 1: No active token -->
     <div class="card text-center" id="noTokenState" style="display: none;">
       <h3>No Active Reservation</h3>

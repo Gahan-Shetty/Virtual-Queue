@@ -10,17 +10,38 @@
  *     state across a disconnect gap.
  */
 
-const { emitToPatient } = require('../config/socket');
-const logger = require('./logger');
-// const nodemailer = require('nodemailer'); // Uncomment when SMTP is configured
-// const twilio = require('twilio');         // Uncomment when Twilio is configured
+const { emitToPatient } = require('../../config/socket');
+const logger = require('../../utils/logger');
+const env = require('../../config/env');
+const nodemailer = require('nodemailer');
 
-// ── Email stub ─────────────────────────────────────────────────────────────
+// ── Email ──────────────────────────────────────────────────────────────────
 
 const sendEmail = async ({ to, subject, text, html }) => {
-  // TODO: replace with real nodemailer transport
-  // const transporter = nodemailer.createTransport({...});
-  // await transporter.sendMail({ from: env.SMTP_FROM, to, subject, text, html });
+  if (env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: env.SMTP_HOST,
+        port: parseInt(env.SMTP_PORT || '587', 10),
+        secure: String(env.SMTP_PORT) === '465',
+        auth: {
+          user: env.SMTP_USER,
+          pass: env.SMTP_PASS,
+        },
+      });
+      await transporter.sendMail({
+        from: env.SMTP_FROM || env.SMTP_USER,
+        to,
+        subject,
+        text,
+        html,
+      });
+      logger.info(`[EMAIL SENT] To: ${to} | Subject: ${subject}`);
+      return;
+    } catch (err) {
+      logger.error(`[EMAIL ERROR] Failed to send email to ${to}: ${err.message}`);
+    }
+  }
   logger.info(`[EMAIL STUB] To: ${to} | Subject: ${subject}`);
 };
 

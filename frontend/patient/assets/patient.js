@@ -93,15 +93,150 @@ if (document.getElementById('loginForm')) {
   });
 }
 
+// ── Verification Helper ────────────────────────────────────────────────────
+
+const setupVerificationFlow = (onSuccess) => {
+  const verifyCard = document.getElementById('verifyAccountCard');
+  if (!verifyCard) return;
+
+  const sendOtpBtn = document.getElementById('sendOtpBtn');
+  const otpViaSelect = document.getElementById('otpViaSelect');
+  const otpSendMsg = document.getElementById('otpSendMsg');
+  const otpVerifyStep = document.getElementById('otpVerifyStep');
+  const otpCodeInput = document.getElementById('otpCodeInput');
+  const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+  const otpVerifyError = document.getElementById('otpVerifyError');
+  const otpVerifySuccess = document.getElementById('otpVerifySuccess');
+  const resendOtpLink = document.getElementById('resendOtpLink');
+
+  const token = localStorage.getItem('token');
+
+  const handleSendOtp = async (e) => {
+    if (e) e.preventDefault();
+    if (otpSendMsg) {
+      otpSendMsg.style.display = 'block';
+      otpSendMsg.textContent = 'Sending OTP...';
+      otpSendMsg.style.color = 'var(--status-waiting)';
+    }
+    if (sendOtpBtn) sendOtpBtn.disabled = true;
+
+    try {
+      const via = otpViaSelect ? otpViaSelect.value : 'email';
+      const res = await fetch(`${API_URL}/auth/otp/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ via })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to send OTP');
+
+      if (otpSendMsg) {
+        otpSendMsg.textContent = data.message || `OTP sent to your ${via}!`;
+        otpSendMsg.style.color = 'var(--status-called)';
+      }
+      if (otpVerifyStep) otpVerifyStep.style.display = 'block';
+    } catch (err) {
+      if (otpSendMsg) {
+        otpSendMsg.textContent = err.message;
+        otpSendMsg.style.color = 'var(--status-no-show)';
+      }
+    } finally {
+      if (sendOtpBtn) sendOtpBtn.disabled = false;
+    }
+  };
+
+  if (sendOtpBtn) {
+    sendOtpBtn.onclick = handleSendOtp;
+  }
+
+  if (resendOtpLink) {
+    resendOtpLink.onclick = (e) => {
+      e.preventDefault();
+      handleSendOtp();
+    };
+  }
+
+  if (verifyOtpBtn) {
+    verifyOtpBtn.onclick = async (e) => {
+      e.preventDefault();
+      const code = otpCodeInput ? otpCodeInput.value.trim() : '';
+      if (!code || code.length < 4) {
+        if (otpVerifyError) {
+          otpVerifyError.textContent = 'Please enter a 6-digit OTP code';
+          otpVerifyError.style.display = 'block';
+        }
+        return;
+      }
+
+      if (otpVerifyError) otpVerifyError.style.display = 'none';
+      if (otpVerifySuccess) otpVerifySuccess.style.display = 'none';
+      verifyOtpBtn.disabled = true;
+
+      try {
+        const via = otpViaSelect ? otpViaSelect.value : 'email';
+        const res = await fetch(`${API_URL}/auth/otp/verify`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ otp: code, via })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Verification failed');
+
+        // Update local user state & store new accessToken (which has isVerified: true in JWT payload)
+        if (data.data) {
+          if (data.data.accessToken) {
+            localStorage.setItem('token', data.data.accessToken);
+          }
+          if (data.data.user) {
+            localStorage.setItem('user', JSON.stringify(data.data.user));
+          } else {
+            let u = JSON.parse(localStorage.getItem('user') || '{}');
+            u.isVerified = true;
+            localStorage.setItem('user', JSON.stringify(u));
+          }
+        } else {
+          let u = JSON.parse(localStorage.getItem('user') || '{}');
+          u.isVerified = true;
+          localStorage.setItem('user', JSON.stringify(u));
+        }
+
+        if (otpVerifySuccess) {
+          otpVerifySuccess.textContent = 'Account verified successfully!';
+          otpVerifySuccess.style.display = 'block';
+        }
+
+        setTimeout(() => {
+          if (onSuccess) onSuccess();
+        }, 1000);
+      } catch (err) {
+        if (otpVerifyError) {
+          otpVerifyError.textContent = err.message;
+          otpVerifyError.style.display = 'block';
+        }
+      } finally {
+        verifyOtpBtn.disabled = false;
+      }
+    };
+  }
+};
+
 // ── Dashboard Logic (dashboard.html) ───────────────────────────────────────
 
 if (document.getElementById('tokenStatus')) {
   const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
   
   if (!token) window.location.href = 'index.html';
   
-  document.getElementById('patientName').textContent = `Welcome, ${user.name}`;
+  if (user && user.name) {
+    document.getElementById('patientName').textContent = `Welcome, ${user.name}`;
+  }
 
   const fetchMyToken = async () => {
     try {
@@ -225,7 +360,26 @@ if (document.getElementById('tokenStatus')) {
     } catch(err) { console.error(err); }
   });
 
-  fetchMyToken();
+  const startDashboardFlow = () => {
+    const freshUser = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!freshUser.isVerified) {
+      const verifyCard = document.getElementById('verifyAccountCard');
+      if (verifyCard) verifyCard.style.display = 'block';
+      document.getElementById('noTokenState').style.display = 'none';
+      document.getElementById('activeTokenState').style.display = 'none';
+
+      setupVerificationFlow(() => {
+        if (verifyCard) verifyCard.style.display = 'none';
+        fetchMyToken();
+      });
+    } else {
+      const verifyCard = document.getElementById('verifyAccountCard');
+      if (verifyCard) verifyCard.style.display = 'none';
+      fetchMyToken();
+    }
+  };
+
+  startDashboardFlow();
 }
 
 // ── Request Token Logic (request.html) ────────────────────────────────────
@@ -237,22 +391,13 @@ if (document.getElementById('requestForm')) {
   const select = document.getElementById('serviceSelect');
   const errorEl = document.getElementById('requestError');
   const btn = document.getElementById('requestBtn');
+  const verifyCard = document.getElementById('verifyAccountCard');
+  const requestCard = document.getElementById('requestCard');
 
-  // We need to fetch services. Since patients belong to an org, we can list services for their org.
-  // We'll create a public/patient-facing service list endpoint in a real app, but for now we'll 
-  // assume we just fetch it (Note: admin routes are protected, we might need a public route).
-  // I will add a quick GET /api/services to the auth or public routes conceptually, 
-  // but let's mock it or assume it exists. Actually, there isn't a public service list in the backend yet.
-  // I will add a script block to fetch it if I update the backend.
-  // For the sake of this UI flow, let's hardcode a service fetch if it fails.
-  
   const loadServices = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      // Find org slug based on user orgId. Easiest way in real app is if it's stored on user obj or fetched. 
-      // For now we assume a hardcoded orgSlug or we can fetch all services if orgId was in query.
-      // Wait, we need orgSlug. Let's just prompt the patient if they don't have it, or use a default for demo.
-      const orgSlug = 'city-hospital'; // Replace with dynamic if available
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const orgSlug = 'city-hospital';
 
       const res = await fetch(`${API_URL}/public/services?orgSlug=${orgSlug}`);
       const data = await res.json();
@@ -270,7 +415,26 @@ if (document.getElementById('requestForm')) {
       select.innerHTML = '<option value="">Error loading services</option>';
     }
   };
-  loadServices();
+
+  const startRequestFlow = () => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!user.isVerified) {
+      if (verifyCard) verifyCard.style.display = 'block';
+      if (requestCard) requestCard.style.display = 'none';
+
+      setupVerificationFlow(() => {
+        if (verifyCard) verifyCard.style.display = 'none';
+        if (requestCard) requestCard.style.display = 'block';
+        loadServices();
+      });
+    } else {
+      if (verifyCard) verifyCard.style.display = 'none';
+      if (requestCard) requestCard.style.display = 'block';
+      loadServices();
+    }
+  };
+
+  startRequestFlow();
 
   document.getElementById('requestForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -307,8 +471,15 @@ if (document.getElementById('requestForm')) {
       
       window.location.href = 'dashboard.html';
     } catch (err) {
-      errorEl.textContent = err.message;
-      errorEl.style.display = 'block';
+      if (err.message && err.message.toLowerCase().includes('not verified')) {
+        let user = JSON.parse(localStorage.getItem('user') || '{}');
+        user.isVerified = false;
+        localStorage.setItem('user', JSON.stringify(user));
+        startRequestFlow();
+      } else {
+        errorEl.textContent = err.message;
+        errorEl.style.display = 'block';
+      }
       btn.disabled = false;
     }
   });

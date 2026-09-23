@@ -7,6 +7,10 @@ const response = require('../../utils/apiResponse');
 
 const requestToken = async (req, res, next) => {
   try {
+    // Fallback: If not in body, pull from headers (resolves discrepancy)
+    if (!req.body.idempotencyKey && req.headers['idempotency-key']) {
+      req.body.idempotencyKey = req.headers['idempotency-key'];
+    }
     const token = await tokenService.requestToken(req.body, req.user);
     return response.created(res, token, 'Token reserved successfully');
   } catch (err) {

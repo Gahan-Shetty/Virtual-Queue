@@ -375,6 +375,50 @@ if (document.getElementById('walkinForm')) {
       });
     };
 
+    const lookupBtn = document.getElementById('lookupBtn');
+    if (lookupBtn) {
+      lookupBtn.addEventListener('click', async () => {
+        const q = document.getElementById('searchQuery').value.trim();
+        const msgEl = document.getElementById('lookupMsg');
+        if (!q) {
+          msgEl.textContent = 'Please enter an email or phone number';
+          msgEl.style.color = 'red';
+          return;
+        }
+
+        msgEl.textContent = 'Searching...';
+        msgEl.style.color = 'var(--text-secondary)';
+
+        try {
+          const res = await fetch(`${API_URL}/admin/users/lookup?q=${encodeURIComponent(q)}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const result = await res.json();
+          if (!res.ok) throw new Error(result.message);
+
+          const p = result.data;
+          document.getElementById('existingPatientId').value = p._id;
+          document.getElementById('patientName').value = p.name;
+          document.getElementById('patientPhone').value = p.phone;
+          document.getElementById('patientEmail').value = p.email || '';
+          
+          document.getElementById('patientName').disabled = true;
+          document.getElementById('patientPhone').disabled = true;
+          document.getElementById('patientEmail').disabled = true;
+
+          msgEl.textContent = 'Patient found and loaded!';
+          msgEl.style.color = 'green';
+        } catch (err) {
+          msgEl.textContent = err.message;
+          msgEl.style.color = 'red';
+          document.getElementById('existingPatientId').value = '';
+          document.getElementById('patientName').disabled = false;
+          document.getElementById('patientPhone').disabled = false;
+          document.getElementById('patientEmail').disabled = false;
+        }
+      });
+    }
+
     const body = {
       serviceId: svcSelect.value,
       idempotencyKey: generateUUID(),
@@ -386,28 +430,30 @@ if (document.getElementById('walkinForm')) {
     };
 
     try {
-      // 1. Create Patient (or fail if exists - simplified demo)
-      const patientBody = {
-        orgSlug: user.orgId, // We need slug, not ID, but the register expects slug. Let's assume slug='city-hospital'
-        orgSlug: 'city-hospital',
-        name: document.getElementById('patientName').value,
-        phone: document.getElementById('patientPhone').value,
-        email: document.getElementById('patientEmail').value || `${Date.now()}@temp.com`,
-        password: 'Password123!' // default for walkins
-      };
+      let pId = document.getElementById('existingPatientId').value;
+      
+      if (!pId) {
+        // 1. Create Patient (or fail if exists - simplified demo)
+        const patientBody = {
+          orgSlug: user.orgId, // We need slug, not ID, but the register expects slug. Let's assume slug='city-hospital'
+          orgSlug: 'city-hospital',
+          name: document.getElementById('patientName').value,
+          phone: document.getElementById('patientPhone').value,
+          email: document.getElementById('patientEmail').value || `${Date.now()}@temp.com`,
+          password: 'Password123!' // default for walkins
+        };
 
-      let pId;
-      const regRes = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(patientBody)
-      });
-      const regData = await regRes.json();
-      if (!regRes.ok) {
-        // If they exist, we should ideally fetch them. For demo, we just fail gracefully.
-        throw new Error('Patient registration failed (maybe email already in use).');
+        const regRes = await fetch(`${API_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patientBody)
+        });
+        const regData = await regRes.json();
+        if (!regRes.ok) {
+          throw new Error(regData.message || 'Patient registration failed (maybe email already in use).');
+        }
+        pId = regData.data.user._id;
       }
-      pId = regData.data.user._id;
 
       // 2. Request Token
       body.patientId = pId;

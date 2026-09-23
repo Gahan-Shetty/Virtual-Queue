@@ -34,4 +34,7 @@ router.patch('/counters/:counterId', requireAdmin, controller.updateCounter);
 router.get('/config', requireAdmin, controller.getOrgConfig);
 router.patch('/config', requireAdmin, controller.updateOrgConfig);
 
+// User Lookup (For Walk-ins)
+router.get('/users/lookup', requireStaffOrAdmin, controller.lookupUser);
+
 module.exports = router;

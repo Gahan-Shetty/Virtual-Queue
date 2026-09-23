@@ -53,6 +53,7 @@ if (document.getElementById('loginForm')) {
       
       localStorage.setItem('token', data.data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.data.user));
+      localStorage.setItem('orgSlug', body.orgSlug);
       window.location.href = 'dashboard.html';
     } catch (err) {
       errorEl.textContent = err.message;
@@ -85,6 +86,7 @@ if (document.getElementById('loginForm')) {
       
       localStorage.setItem('token', data.data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.data.user));
+      localStorage.setItem('orgSlug', body.orgSlug);
       window.location.href = 'dashboard.html'; // Usually needs OTP, bypassing for demo
     } catch (err) {
       errorEl.textContent = err.message;
@@ -397,7 +399,9 @@ if (document.getElementById('requestForm')) {
   const loadServices = async () => {
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const orgSlug = 'city-hospital';
+      const urlParams = new URLSearchParams(window.location.search);
+      const orgSlug = urlParams.get('org') || localStorage.getItem('orgSlug') || 'city-hospital';
+      if (urlParams.get('org')) localStorage.setItem('orgSlug', orgSlug);
 
       const res = await fetch(`${API_URL}/public/services?orgSlug=${orgSlug}`);
       const data = await res.json();

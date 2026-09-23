@@ -106,10 +106,19 @@ const getDashboard = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// ── User Lookup ────────────────────────────────────────────────────────────
+const lookupUser = async (req, res, next) => {
+  try {
+    const user = await adminService.lookupUser(req.user.orgId, req.query.q);
+    return response.success(res, user);
+  } catch (err) { next(err); }
+};
+
 module.exports = {
   createStaff, listStaff, updateStaff, deactivateStaff,
   createService, listServices, updateService, deleteService,
   createCounter, listCounters, updateCounter,
   getOrgConfig, updateOrgConfig,
   getDashboard,
+  lookupUser,
 };

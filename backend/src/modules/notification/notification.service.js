@@ -14,6 +14,7 @@ const { emitToPatient } = require('../../config/socket');
 const logger = require('../../utils/logger');
 const env = require('../../config/env');
 const nodemailer = require('nodemailer');
+const twilio = require('twilio');
 
 // ── Email ──────────────────────────────────────────────────────────────────
 
@@ -48,9 +49,17 @@ const sendEmail = async ({ to, subject, text, html }) => {
 // ── SMS stub ───────────────────────────────────────────────────────────────
 
 const sendSMS = async ({ to, body }) => {
-  // TODO: replace with real Twilio client
-  // const client = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
-  // await client.messages.create({ body, from: env.TWILIO_PHONE_NUMBER, to });
+  if (env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && env.TWILIO_PHONE_NUMBER) {
+    try {
+      const client = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
+      await client.messages.create({ body, from: env.TWILIO_PHONE_NUMBER, to });
+      logger.info(`[SMS SENT] To: ${to} | Message: ${body}`);
+      return;
+    } catch (err) {
+      logger.error(`[SMS ERROR] Failed to send SMS to ${to}: ${err.message}`);
+    }
+  }
+  
   logger.info(`[SMS STUB] To: ${to} | Message: ${body}`);
 };
 

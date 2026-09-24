@@ -10,7 +10,12 @@ const user = JSON.parse(localStorage.getItem('admin_user'));
 const logoutBtn = document.getElementById('logoutBtn');
 
 if (logoutBtn) {
-  logoutBtn.addEventListener('click', () => {
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      if (token) {
+        await fetch(`${API_URL}/auth/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+      }
+    } catch(e) {}
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
     window.location.href = 'index.html';

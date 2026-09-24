@@ -2,6 +2,19 @@
 const API_URL = 'http://localhost:5000/api';
 let socket;
 
+const showToast = (msg, type = 'info') => {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = `
+    position: fixed; top: 20px; right: 20px; padding: 12px 20px;
+    background: ${type === 'error' ? '#ef4444' : '#3b82f6'}; color: white;
+    border-radius: 8px; font-weight: 500; z-index: 9999;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  `;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+};
+
 // Helper: UUID generator for Idempotency-Key
 const generateUUID = () => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -328,7 +341,7 @@ if (document.getElementById('tokenStatus')) {
   });
 
   socket.on('token:expired', (data) => {
-    alert(data.message);
+    showToast(data.message, 'error');
     fetchMyToken();
   });
 
@@ -338,12 +351,12 @@ if (document.getElementById('tokenStatus')) {
   });
 
   socket.on('token:completed', (data) => {
-    alert(data.message);
+    showToast(data.message, 'info');
     fetchMyToken();
   });
 
   socket.on('token:no_show', (data) => {
-    alert(data.message);
+    showToast(data.message, 'error');
     fetchMyToken();
   });
 

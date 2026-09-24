@@ -249,69 +249,20 @@ npx serve frontend
 
 ### Seeding Initial Data
 
-The database starts empty. You need to create an organisation and an admin user before anything else works.
-
-**Step 1 — Create your organisation** (via MongoDB shell or Compass):
-
-```javascript
-db.organizations.insertOne({
-  name: "City Hospital",
-  slug: "city-hospital",
-  isActive: true,
-  bookingOpenTime: "08:00",
-  bookingCloseTime: "11:00",
-  serviceStartTime: "09:00",
-  serviceEndTime: "13:00",
-  onlineCapacity: 60,
-  walkInCapacity: 40,
-  reservationExpiryMinutes: 30,
-  checkInGracePeriodMinutes: 10,
-  noShowGracePeriodMinutes: 5,
-  maxNoShowRejoinsPerDay: 1
-});
-```
-
-**Step 2 — Create an admin user** (via API):
+The database starts empty. To easily generate an initial organisation and test users without manually running database queries, you can use the provided seed script:
 
 ```bash
-# First, register with any email (this creates a PATIENT — we'll upgrade it next)
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Admin User",
-    "email": "admin@hospital.com",
-    "phone": "9999999999",
-    "password": "Admin@123",
-    "orgSlug": "city-hospital"
-  }'
-
-# Then, in the MongoDB shell, update the role:
-db.users.updateOne(
-  { email: "admin@hospital.com" },
-  { $set: { role: "ADMIN", isVerified: true } }
-)
+# From the backend directory
+node seed_users.js
 ```
 
-**Step 3 — Log in and create services + counters** via the Admin Portal or API:
+This will automatically:
+1. Create a default organisation.
+2. Create an **Admin** user.
+3. Create a **Receptionist** (Staff) user.
+4. Create test **Patient** users.
 
-```bash
-# Login as admin
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@hospital.com","password":"Admin@123","orgSlug":"city-hospital"}'
-
-# Use the returned accessToken to create a service
-curl -X POST http://localhost:5000/api/admin/services \
-  -H "Authorization: Bearer <ACCESS_TOKEN>" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"OPD","tokenPrefix":"OPD","avgServiceTimeMinutes":5,"dailyCapacity":50}'
-
-# Create a counter for that service
-curl -X POST http://localhost:5000/api/admin/counters \
-  -H "Authorization: Bearer <ACCESS_TOKEN>" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Counter 1","serviceId":"<SERVICE_ID>"}'
-```
+The script will print out the login credentials for each user directly in your terminal. You can use these to log into the respective portals (Admin, Staff, Patient) to create services, counters, and test the queue flow.
 
 ---
 

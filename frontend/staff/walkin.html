@@ -35,8 +35,14 @@
             
             <hr style="border:0; border-top:1px solid var(--border-color); margin:1.5rem 0;">
             
-            <!-- In a real system you'd search for existing patients. We'll simplify to just creating the user/token -->
+            <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
+              <input type="text" id="searchQuery" placeholder="Search by Phone or Email..." style="flex: 1; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
+              <button type="button" class="btn btn-outline" id="lookupBtn">Search</button>
+            </div>
+            <div id="lookupMsg" style="margin-bottom: 1rem; font-size: 0.875rem;"></div>
+            
             <h4>Patient Details</h4>
+            <input type="hidden" id="existingPatientId" value="">
             <div class="form-group" style="margin-top:1rem;">
               <label>Name</label>
               <input type="text" id="patientName" required>

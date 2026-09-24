@@ -42,6 +42,10 @@ class RedisStore {
  * Factory: create a rate limiter with given parameters.
  */
 const createLimiter = ({ windowMinutes = 15, max = 100, prefix = 'rl:general', message = 'Too many requests, please try again later.' } = {}) => {
+  if (process.env.DISABLE_RATE_LIMIT === 'true') {
+    return (req, res, next) => next();
+  }
+
   const store = new RedisStore(prefix);
   store.windowSeconds = windowMinutes * 60;
 

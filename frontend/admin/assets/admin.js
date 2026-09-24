@@ -10,7 +10,12 @@ const user = JSON.parse(localStorage.getItem('admin_user'));
 const logoutBtn = document.getElementById('logoutBtn');
 
 if (logoutBtn) {
-  logoutBtn.addEventListener('click', () => {
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      if (token) {
+        await fetch(`${API_URL}/auth/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+      }
+    } catch(e) {}
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
     window.location.href = 'index.html';
@@ -336,4 +341,131 @@ if (servicesTableBody) {
   }
 
   loadServices();
+}
+
+// ── Counters Logic ─────────────────────────────────────────────────────────
+
+const countersTableBody = document.getElementById('countersTableBody');
+if (countersTableBody) {
+  if (!token) window.location.href = 'index.html';
+
+  const loadCounters = async () => {
+    try {
+      const res = await fetch(`${API_URL}/admin/counters`, { headers: { Authorization: `Bearer ${token}` } });
+      const { data } = await res.json();
+      countersTableBody.innerHTML = '';
+      if (!data || data.length === 0) {
+        countersTableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No counters found</td></tr>';
+        return;
+      }
+      data.forEach((c) => {
+        countersTableBody.innerHTML += `
+          <tr>
+            <td style="font-weight:500;">${c.name}</td>
+            <td>${c.serviceId ? 'Assigned' : 'Unassigned'}</td>
+            <td>${c.assignedStaffId ? c.assignedStaffId.name : '--'}</td>
+            <td><span class="badge badge-${c.status || 'ACTIVE'}">${c.status || 'ACTIVE'}</span></td>
+          </tr>
+        `;
+      });
+    } catch (e) { console.error(e); }
+  };
+
+  const counterServiceSelect = document.getElementById('counterService');
+  const populateServicesForCounter = async () => {
+    try {
+      const res = await fetch(`${API_URL}/admin/services`, { headers: { Authorization: `Bearer ${token}` } });
+      const { data } = await res.json();
+      if (data) {
+        data.forEach(s => {
+          counterServiceSelect.innerHTML += `<option value="${s._id}">${s.name}</option>`;
+        });
+      }
+    } catch (e) { console.error(e); }
+  };
+
+  const addCounterForm = document.getElementById('addCounterForm');
+  if (addCounterForm) {
+    addCounterForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('counterMsg');
+      const body = {
+        name: document.getElementById('counterName').value,
+        serviceId: document.getElementById('counterService').value
+      };
+      try {
+        const res = await fetch(`${API_URL}/admin/counters`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error((await res.json()).message);
+        msg.textContent = 'Counter created.';
+        addCounterForm.reset();
+        await loadCounters();
+        setTimeout(() => { msg.textContent = ''; }, 3000);
+      } catch (err) { msg.textContent = err.message; }
+    });
+  }
+
+  loadCounters();
+  populateServicesForCounter();
+}
+
+// ── Staff Logic ────────────────────────────────────────────────────────────
+
+const staffTableBody = document.getElementById('staffTableBody');
+if (staffTableBody) {
+  if (!token) window.location.href = 'index.html';
+
+  const loadStaff = async () => {
+    try {
+      const res = await fetch(`${API_URL}/admin/staff`, { headers: { Authorization: `Bearer ${token}` } });
+      const { data } = await res.json();
+      staffTableBody.innerHTML = '';
+      if (!data || data.length === 0) {
+        staffTableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No staff found</td></tr>';
+        return;
+      }
+      data.forEach((s) => {
+        staffTableBody.innerHTML += `
+          <tr>
+            <td style="font-weight:500;">${s.name}</td>
+            <td><span class="badge badge-${s.role}">${s.role}</span></td>
+            <td>${s.email}</td>
+            <td>${s.phone}</td>
+          </tr>
+        `;
+      });
+    } catch (e) { console.error(e); }
+  };
+
+  const addStaffForm = document.getElementById('addStaffForm');
+  if (addStaffForm) {
+    addStaffForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('staffMsg');
+      const body = {
+        name: document.getElementById('staffName').value,
+        email: document.getElementById('staffEmail').value,
+        phone: document.getElementById('staffPhone').value,
+        password: document.getElementById('staffPassword').value,
+        role: document.getElementById('staffRole').value
+      };
+      try {
+        const res = await fetch(`${API_URL}/admin/staff`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error((await res.json()).message);
+        msg.textContent = 'Staff created.';
+        addStaffForm.reset();
+        await loadStaff();
+        setTimeout(() => { msg.textContent = ''; }, 3000);
+      } catch (err) { msg.textContent = err.message; }
+    });
+  }
+
+  loadStaff();
 }

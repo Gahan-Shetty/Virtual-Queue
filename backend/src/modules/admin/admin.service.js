@@ -210,10 +210,24 @@ const getDashboardStats = async (orgId) => {
   return { date: today, total, completed, expired, noShow, waiting, serving, patients, staff };
 };
 
+// ── User Lookup ─────────────────────────────────────────────────────────────
+
+const lookupUser = async (orgId, query) => {
+  if (!query) throw new AppError('Search query (email/phone) is required', 400);
+  const user = await User.findOne({ 
+    orgId, 
+    role: 'PATIENT', 
+    $or: [{ email: query }, { phone: query }] 
+  }).select('-passwordHash -refreshTokenHash');
+  if (!user) throw new AppError('Patient not found', 404);
+  return user;
+};
+
 module.exports = {
   createStaff, listStaff, updateStaff, deactivateStaff,
   createService, listServices, updateService, deleteService,
   createCounter, listCounters, updateCounter,
   getOrgConfig, updateOrgConfig,
   getDashboardStats,
+  lookupUser,
 };

@@ -55,7 +55,7 @@ const isWithinBookingWindow = (org) => {
   const [closeH, closeM] = org.bookingCloseTime.split(':').map(Number);
   const openMs = (openH * 60 + openM) * 60000;
   const closeMs = (closeH * 60 + closeM) * 60000;
-  const nowMs = (now.getUTCHours() * 60 + now.getUTCMinutes()) * 60000;
+  const nowMs = (now.getHours() * 60 + now.getMinutes()) * 60000;
   return nowMs >= openMs && nowMs <= closeMs;
 };
 
@@ -68,8 +68,8 @@ const resolveCapacity = (org, service) => ({
 /** Generate sequential token number: PREFIX + zero-padded number */
 const buildTokenNumber = async (orgId, serviceId, serviceDate, prefix) => {
   const redisKey = `tokenseq:${orgId}:${serviceId}:${serviceDate}`;
-  const seq = await redis.incr(redisKey);
-  if (seq === 1) await redis.expire(redisKey, 86400); // auto-clean daily
+  const results = await redis.multi().incr(redisKey).expire(redisKey, 86400).exec();
+  const seq = results[0][1];
   return `${prefix}${String(seq).padStart(3, '0')}`;
 };
 

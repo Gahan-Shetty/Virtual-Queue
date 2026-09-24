@@ -11,7 +11,12 @@ const user = JSON.parse(localStorage.getItem('staff_user'));
 // ── Shared UI ──────────────────────────────────────────────────────────────
 
 if (document.getElementById('logoutBtn')) {
-  document.getElementById('logoutBtn').addEventListener('click', () => {
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    try {
+      if (token) {
+        await fetch(`${API_URL}/auth/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+      }
+    } catch(e) {}
     localStorage.removeItem('staff_token');
     localStorage.removeItem('staff_user');
     window.location.href = 'index.html';
@@ -123,7 +128,7 @@ if (document.getElementById('queueTableBody')) {
     
     // Update active patient panel if we have a counter selected
     if (currentCounterId) {
-      const myActive = activeTokens.find(t => t.counterId && t.counterId._id === currentCounterId);
+      const myActive = activeTokens.find(t => t.counterId && (t.counterId._id === currentCounterId || t.counterId._id?.toString() === currentCounterId));
       if (myActive) {
         document.getElementById('activePatientPanel').style.display = 'block';
         document.getElementById('activeToken').textContent = myActive.tokenNumber;
@@ -319,7 +324,10 @@ if (document.getElementById('video')) {
 // Manual fallback (for Check-in)
   const svcSelect = document.getElementById('serviceSelect');
   fetchAdminServices().then(services => {
+    svcSelect.innerHTML = '<option value="">Select service...</option>';
     services.forEach(s => svcSelect.innerHTML += `<option value="${s._id}">${s.name}</option>`);
+  }).catch(() => {
+    svcSelect.innerHTML = '<option value="">Error loading services</option>';
   });
 
   document.getElementById('manualCheckinForm').addEventListener('submit', async (e) => {
@@ -357,7 +365,10 @@ if (document.getElementById('walkinForm')) {
 
   const svcSelect = document.getElementById('serviceSelect');
   fetchAdminServices().then(services => {
+    svcSelect.innerHTML = '<option value="">Select service...</option>';
     services.forEach(s => svcSelect.innerHTML += `<option value="${s._id}">${s.name}</option>`);
+  }).catch(() => {
+    svcSelect.innerHTML = '<option value="">Error loading services</option>';
   });
 
   document.getElementById('walkinForm').addEventListener('submit', async (e) => {
@@ -375,6 +386,50 @@ if (document.getElementById('walkinForm')) {
       });
     };
 
+    const lookupBtn = document.getElementById('lookupBtn');
+    if (lookupBtn) {
+      lookupBtn.addEventListener('click', async () => {
+        const q = document.getElementById('searchQuery').value.trim();
+        const msgEl = document.getElementById('lookupMsg');
+        if (!q) {
+          msgEl.textContent = 'Please enter an email or phone number';
+          msgEl.style.color = 'red';
+          return;
+        }
+
+        msgEl.textContent = 'Searching...';
+        msgEl.style.color = 'var(--text-secondary)';
+
+        try {
+          const res = await fetch(`${API_URL}/admin/users/lookup?q=${encodeURIComponent(q)}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const result = await res.json();
+          if (!res.ok) throw new Error(result.message);
+
+          const p = result.data;
+          document.getElementById('existingPatientId').value = p._id;
+          document.getElementById('patientName').value = p.name;
+          document.getElementById('patientPhone').value = p.phone;
+          document.getElementById('patientEmail').value = p.email || '';
+          
+          document.getElementById('patientName').disabled = true;
+          document.getElementById('patientPhone').disabled = true;
+          document.getElementById('patientEmail').disabled = true;
+
+          msgEl.textContent = 'Patient found and loaded!';
+          msgEl.style.color = 'green';
+        } catch (err) {
+          msgEl.textContent = err.message;
+          msgEl.style.color = 'red';
+          document.getElementById('existingPatientId').value = '';
+          document.getElementById('patientName').disabled = false;
+          document.getElementById('patientPhone').disabled = false;
+          document.getElementById('patientEmail').disabled = false;
+        }
+      });
+    }
+
     const body = {
       serviceId: svcSelect.value,
       idempotencyKey: generateUUID(),
@@ -386,28 +441,44 @@ if (document.getElementById('walkinForm')) {
     };
 
     try {
-      // 1. Create Patient (or fail if exists - simplified demo)
-      const patientBody = {
-        orgSlug: user.orgId, // We need slug, not ID, but the register expects slug. Let's assume slug='city-hospital'
-        orgSlug: 'city-hospital',
-        name: document.getElementById('patientName').value,
-        phone: document.getElementById('patientPhone').value,
-        email: document.getElementById('patientEmail').value || `${Date.now()}@temp.com`,
-        password: 'Password123!' // default for walkins
-      };
+      let pId = document.getElementById('existingPatientId').value;
+      
+      if (!pId) {
+        // 1. Create Patient (or fail if exists - simplified demo)
+        const orgSlug = localStorage.getItem('orgSlug') || 'city-hospital';
+        const patientBody = {
+          orgSlug: orgSlug,
+          name: document.getElementById('patientName').value,
+          phone: document.getElementById('patientPhone').value,
+          email: document.getElementById('patientEmail').value || `${Date.now()}@temp.com`,
+          password: 'Password123!' // default for walkins
+        };
 
-      let pId;
-      const regRes = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(patientBody)
-      });
-      const regData = await regRes.json();
-      if (!regRes.ok) {
-        // If they exist, we should ideally fetch them. For demo, we just fail gracefully.
-        throw new Error('Patient registration failed (maybe email already in use).');
+        const regRes = await fetch(`${API_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patientBody)
+        });
+        const regData = await regRes.json();
+        
+        if (!regRes.ok) {
+          if (regRes.status === 409 || (regData.message && regData.message.toLowerCase().includes('already in use'))) {
+            const lookupRes = await fetch(`${API_URL}/admin/users/lookup?q=${encodeURIComponent(patientBody.email || patientBody.phone)}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const lookupData = await lookupRes.json();
+            if (lookupRes.ok && lookupData.data) {
+              pId = lookupData.data._id;
+            } else {
+              throw new Error('Patient exists but could not be retrieved.');
+            }
+          } else {
+            throw new Error(regData.message || 'Patient registration failed.');
+          }
+        } else {
+          pId = regData.data.user._id;
+        }
       }
-      pId = regData.data.user._id;
 
       // 2. Request Token
       body.patientId = pId;

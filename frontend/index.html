@@ -4,17 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Virtual Queue System</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-color: #f8fafc;
-      --surface-color: #ffffff;
       --text-primary: #0f172a;
       --text-secondary: #475569;
-      --border-color: #cbd5e1;
-      --primary: #4338ca;
-      --primary-hover: #3730a3;
-      --radius: 12px;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --radius: 16px;
     }
     * {
       box-sizing: border-box;
@@ -23,112 +21,279 @@
     }
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+      background: var(--bg-color);
       color: var(--text-primary);
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
+      overflow: hidden;
     }
+    /* Split Layout */
+    .split-layout {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+    }
+    .left-side {
+      flex: 1;
+      padding: 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+      overflow-y: auto;
+    }
+    .right-side {
+      flex: 1;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    
+    /* Left Side Content */
     .header {
-      text-align: center;
       margin-bottom: 3rem;
+      max-width: 600px;
     }
     .header h1 {
-      font-size: 3rem;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 4rem;
       font-weight: 700;
       color: var(--primary);
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      line-height: 1.1;
     }
     .header p {
       font-size: 1.25rem;
       color: var(--text-secondary);
+      line-height: 1.6;
     }
+    
     .portals {
       display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 1000px;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 600px;
     }
     .portal-card {
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(10px);
-      padding: 2.5rem;
+      padding: 1.5rem 2rem;
       border-radius: var(--radius);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      width: 300px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
       text-decoration: none;
       color: inherit;
+      transition: all 0.3s ease;
     }
     .portal-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: translateX(10px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      border-color: var(--primary);
     }
     .portal-icon {
-      font-size: 3rem;
-      margin-bottom: 1.5rem;
-      color: var(--primary);
+      font-size: 2.5rem;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e0e7ff;
+      border-radius: 12px;
+    }
+    .portal-content {
+      flex: 1;
     }
     .portal-title {
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       font-weight: 600;
-      margin-bottom: 1rem;
+      margin-bottom: 0.25rem;
+      color: var(--text-primary);
     }
     .portal-desc {
       color: var(--text-secondary);
-      font-size: 1rem;
-      margin-bottom: 2rem;
-      line-height: 1.5;
+      font-size: 0.95rem;
     }
-    .portal-btn {
-      display: inline-block;
-      padding: 0.75rem 1.5rem;
-      background: var(--primary);
+    .portal-arrow {
+      color: var(--primary);
+      font-size: 1.5rem;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: all 0.3s ease;
+    }
+    .portal-card:hover .portal-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Right Side Animation (Queue) */
+    .queue-animation {
+      position: relative;
+      height: 150%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      transform: rotate(-15deg);
+    }
+    .queue-track {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      animation: scrollQueue 20s linear infinite;
+    }
+    .queue-ticket {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 1.5rem;
+      border-radius: 16px;
+      width: 250px;
       color: white;
-      border-radius: 8px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: background 0.2s ease;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
     }
-    .portal-card:hover .portal-btn {
-      background: var(--primary-hover);
+    .queue-ticket .q-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-style: italic;
+      margin-bottom: 0.5rem;
+      color: #c7d2fe;
+    }
+    .queue-ticket .q-stat {
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.8;
+    }
+    .queue-ticket.active {
+      background: rgba(79, 70, 229, 0.4);
+      border-color: #818cf8;
+    }
+    .queue-ticket.active .q-num {
+      color: #ffffff;
+    }
+    
+    @keyframes scrollQueue {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-50%); }
+    }
+    
+    /* Decorative glowing orb */
+    .glow-orb {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(99,102,241,0.4) 0%, rgba(99,102,241,0) 70%);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .split-layout { flex-direction: column; height: auto; }
+      .left-side { padding: 2rem; }
+      .right-side { height: 400px; }
+      body { overflow: auto; }
     }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>Virtual Queue System</h1>
-    <p>Select your portal to continue</p>
-  </div>
+  <div class="split-layout">
+    <div class="left-side">
+      <div class="header">
+        <h1>Virtual Queue</h1>
+        <p>A seamless and intelligent waiting experience. Select your portal to continue.</p>
+      </div>
 
-  <div class="portals">
-    <a href="patient/index.html" class="portal-card">
-      <div class="portal-icon">🩺</div>
-      <h2 class="portal-title">Patient Portal</h2>
-      <p class="portal-desc">Book appointments, check queue status, and manage your profile.</p>
-      <span class="portal-btn">Enter Patient Portal</span>
-    </a>
+      <div class="portals">
+        <a href="/patient/index.html" class="portal-card">
+          <div class="portal-icon">🩺</div>
+          <div class="portal-content">
+            <h2 class="portal-title">Patient Portal</h2>
+            <p class="portal-desc">Book appointments, check queue status, and manage your profile.</p>
+          </div>
+          <div class="portal-arrow">→</div>
+        </a>
 
-    <a href="staff/index.html" class="portal-card">
-      <div class="portal-icon">👨‍⚕️</div>
-      <h2 class="portal-title">Staff Portal</h2>
-      <p class="portal-desc">Manage ongoing queues, call next patients, and update statuses.</p>
-      <span class="portal-btn">Enter Staff Portal</span>
-    </a>
+        <a href="/staff/index.html" class="portal-card">
+          <div class="portal-icon">👨‍⚕️</div>
+          <div class="portal-content">
+            <h2 class="portal-title">Staff Portal</h2>
+            <p class="portal-desc">Manage ongoing queues, call next patients, and update statuses.</p>
+          </div>
+          <div class="portal-arrow">→</div>
+        </a>
 
-    <a href="admin/index.html" class="portal-card">
-      <div class="portal-icon">⚙️</div>
-      <h2 class="portal-title">Admin Portal</h2>
-      <p class="portal-desc">Configure system settings, manage staff, services, and counters.</p>
-      <span class="portal-btn">Enter Admin Portal</span>
-    </a>
+        <a href="/admin/index.html" class="portal-card">
+          <div class="portal-icon">⚙️</div>
+          <div class="portal-content">
+            <h2 class="portal-title">Admin Portal</h2>
+            <p class="portal-desc">Configure system settings, manage staff, services, and counters.</p>
+          </div>
+          <div class="portal-arrow">→</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="right-side">
+      <div class="glow-orb"></div>
+      <div class="queue-animation">
+        <!-- We duplicate the items to make the infinite scroll smooth -->
+        <div class="queue-track">
+          <div class="queue-ticket">
+            <div class="q-num">A-104</div>
+            <div class="q-stat">Waiting • 15 mins</div>
+          </div>
+          <div class="queue-ticket">
+            <div class="q-num">A-103</div>
+            <div class="q-stat">Waiting • 10 mins</div>
+          </div>
+          <div class="queue-ticket active">
+            <div class="q-num">A-102</div>
+            <div class="q-stat">Now Serving • Counter 2</div>
+          </div>
+          <div class="queue-ticket">
+            <div class="q-num">B-051</div>
+            <div class="q-stat">Waiting • 5 mins</div>
+          </div>
+          <div class="queue-ticket">
+            <div class="q-num">A-105</div>
+            <div class="q-stat">Waiting • 20 mins</div>
+          </div>
+          <!-- Duplicates for seamless loop -->
+          <div class="queue-ticket">
+            <div class="q-num">A-104</div>
+            <div class="q-stat">Waiting • 15 mins</div>
+          </div>
+          <div class="queue-ticket">
+            <div class="q-num">A-103</div>
+            <div class="q-stat">Waiting • 10 mins</div>
+          </div>
+          <div class="queue-ticket active">
+            <div class="q-num">A-102</div>
+            <div class="q-stat">Now Serving • Counter 2</div>
+          </div>
+          <div class="queue-ticket">
+            <div class="q-num">B-051</div>
+            <div class="q-stat">Waiting • 5 mins</div>
+          </div>
+          <div class="queue-ticket">
+            <div class="q-num">A-105</div>
+            <div class="q-stat">Waiting • 20 mins</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </body>

@@ -67,7 +67,7 @@ if (document.getElementById('loginForm')) {
       localStorage.setItem('token', data.data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.data.user));
       localStorage.setItem('orgSlug', body.orgSlug);
-      window.location.href = 'dashboard.html';
+      window.location.href = '/patient/dashboard.html';
     } catch (err) {
       errorEl.textContent = err.message;
       errorEl.style.display = 'block';
@@ -100,7 +100,7 @@ if (document.getElementById('loginForm')) {
       localStorage.setItem('token', data.data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.data.user));
       localStorage.setItem('orgSlug', body.orgSlug);
-      window.location.href = 'dashboard.html'; // Usually needs OTP, bypassing for demo
+      window.location.href = '/patient/dashboard.html'; // Usually needs OTP, bypassing for demo
     } catch (err) {
       errorEl.textContent = err.message;
       errorEl.style.display = 'block';
@@ -247,7 +247,7 @@ if (document.getElementById('tokenStatus')) {
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   
-  if (!token) window.location.href = 'index.html';
+  if (!token) window.location.href = '/patient/index.html';
   
   if (user && user.name) {
     document.getElementById('patientName').textContent = `Welcome, ${user.name}`;
@@ -260,7 +260,7 @@ if (document.getElementById('tokenStatus')) {
       });
       const data = await res.json();
       
-      if (res.status === 404) {
+      if (res.status === 404 || (res.ok && !data.data)) {
         document.getElementById('noTokenState').style.display = 'block';
         document.getElementById('activeTokenState').style.display = 'none';
         return null;
@@ -273,7 +273,7 @@ if (document.getElementById('tokenStatus')) {
     } catch (err) {
       console.error(err);
       if (err.message.includes('token') || err.message.includes('Auth')) {
-         window.location.href = 'index.html';
+         window.location.href = '/patient/index.html';
       }
     }
   };
@@ -401,7 +401,7 @@ if (document.getElementById('tokenStatus')) {
 
 if (document.getElementById('requestForm')) {
   const token = localStorage.getItem('token');
-  if (!token) window.location.href = 'index.html';
+  if (!token) window.location.href = '/patient/index.html';
 
   const select = document.getElementById('serviceSelect');
   const errorEl = document.getElementById('requestError');
@@ -486,7 +486,7 @@ if (document.getElementById('requestForm')) {
       
       if (!res.ok) throw new Error(data.message);
       
-      window.location.href = 'dashboard.html';
+      window.location.href = '/patient/dashboard.html';
     } catch (err) {
       if (err.message && err.message.toLowerCase().includes('not verified')) {
         let user = JSON.parse(localStorage.getItem('user') || '{}');

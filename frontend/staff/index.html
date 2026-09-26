@@ -6,28 +6,119 @@
   <title>Staff Login - Virtual Queue</title>
   <link rel="stylesheet" href="/staff/assets/staff.css">
   <style>
-    .login-container { max-width: 400px; margin: 100px auto; }
+    /* Patient-like theme with Staff (Emerald) colors */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&display=swap');
+    
+    body {
+      background: linear-gradient(135deg, #d1fae5 0%, #f8fafc 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      width: 100%;
+      max-width: 450px;
+      padding: 2rem;
+    }
+    .login-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .login-header .display-title {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 2.5rem;
+      color: #059669; /* Emerald 600 */
+      margin-bottom: 0.5rem;
+    }
+    .login-header p {
+      color: #475569;
+      font-size: 1.1rem;
+    }
+    .login-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    .login-card h2 {
+      margin-bottom: 1.5rem;
+      color: #0f172a;
+      font-weight: 600;
+      text-align: center;
+    }
+    .login-card .form-group label {
+      font-weight: 500;
+      color: #475569;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .login-card .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      margin-bottom: 1.25rem;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .login-card .form-group input:focus {
+      outline: none;
+      border-color: #059669;
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+    }
+    .login-card .btn-primary {
+      width: 100%;
+      padding: 0.875rem;
+      background: #059669;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .login-card .btn-primary:hover {
+      background: #047857;
+    }
+    #errorMsg {
+      color: #dc2626;
+      font-size: 0.875rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div class="login-container">
-    <div class="panel">
-      <h2 style="margin-bottom: 1rem;">Staff Portal</h2>
+    <header class="login-header">
+      <h1 class="display-title">Staff Portal</h1>
+      <p>Manage queues and call patients</p>
+    </header>
+    <div class="login-card">
+      <h2>Sign In</h2>
       <form id="loginForm">
         <div class="form-group">
           <label>Organization Code</label>
-          <input type="text" id="orgSlug" required value="city-hospital">
+          <input type="text" id="orgSlug" required value="city-hospital" placeholder="e.g., city-hospital">
         </div>
         <div class="form-group">
           <label>Email</label>
-          <input type="email" id="email" required>
+          <input type="email" id="email" required placeholder="staff@hospital.com">
         </div>
         <div class="form-group">
           <label>Password</label>
           <input type="password" id="password" required>
         </div>
-        <div id="errorMsg" style="color: red; margin-bottom: 1rem; display: none;"></div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+        <div id="errorMsg"></div>
+        <button type="submit" class="btn-primary">Login to Dashboard</button>
       </form>
     </div>
   </div>

@@ -19,7 +19,7 @@ if (document.getElementById('logoutBtn')) {
     } catch(e) {}
     localStorage.removeItem('staff_token');
     localStorage.removeItem('staff_user');
-    window.location.href = 'index.html';
+    window.location.href = '/staff/index.html';
   });
   
   if (user) {
@@ -100,7 +100,7 @@ const fetchAdminCounters = async (serviceId) => {
 // ── Console Logic (console.html) ───────────────────────────────────────────
 
 if (document.getElementById('queueTableBody')) {
-  if (!token) window.location.href = 'index.html';
+  if (!token) window.location.href = '/staff/index.html';
 
   const svcSelect = document.getElementById('serviceSelect');
   const cntSelect = document.getElementById('counterSelect');
@@ -262,7 +262,7 @@ if (document.getElementById('queueTableBody')) {
 // ── Check-in Logic (checkin.html) ──────────────────────────────────────────
 
 if (document.getElementById('video')) {
-  if (!token) window.location.href = 'index.html';
+  if (!token) window.location.href = '/staff/index.html';
 
   const video = document.getElementById('video');
   const canvasElement = document.getElementById('canvas');
@@ -361,7 +361,7 @@ if (document.getElementById('video')) {
 // ── Walk-in Logic (walkin.html) ────────────────────────────────────────────
 
 if (document.getElementById('walkinForm')) {
-  if (!token) window.location.href = 'index.html';
+  if (!token) window.location.href = '/staff/index.html';
 
   const svcSelect = document.getElementById('serviceSelect');
   fetchAdminServices().then(services => {

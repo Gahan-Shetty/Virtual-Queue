@@ -29,4 +29,6 @@ Thumbs.db
 .idea/
 
 # ── Scripts ───────────────────────────────────────────────────────────────────
-seed_users.js
+seed_users.js
+
+Design.md/

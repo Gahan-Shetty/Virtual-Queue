@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Queue System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --surface-color: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --border-color: #cbd5e1;
+      --primary: #4338ca;
+      --primary-hover: #3730a3;
+      --radius: 12px;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+    .header p {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+    }
+    .portals {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 1000px;
+    }
+    .portal-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 2.5rem;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 300px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+    .portal-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .portal-icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+    }
+    .portal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .portal-desc {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+    .portal-btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: var(--primary);
+      color: white;
+      border-radius: 8px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+    .portal-card:hover .portal-btn {
+      background: var(--primary-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Virtual Queue System</h1>
+    <p>Select your portal to continue</p>
+  </div>
+
+  <div class="portals">
+    <a href="patient/index.html" class="portal-card">
+      <div class="portal-icon">🩺</div>
+      <h2 class="portal-title">Patient Portal</h2>
+      <p class="portal-desc">Book appointments, check queue status, and manage your profile.</p>
+      <span class="portal-btn">Enter Patient Portal</span>
+    </a>
+
+    <a href="staff/index.html" class="portal-card">
+      <div class="portal-icon">👨‍⚕️</div>
+      <h2 class="portal-title">Staff Portal</h2>
+      <p class="portal-desc">Manage ongoing queues, call next patients, and update statuses.</p>
+      <span class="portal-btn">Enter Staff Portal</span>
+    </a>
+
+    <a href="admin/index.html" class="portal-card">
+      <div class="portal-icon">⚙️</div>
+      <h2 class="portal-title">Admin Portal</h2>
+      <p class="portal-desc">Configure system settings, manage staff, services, and counters.</p>
+      <span class="portal-btn">Enter Admin Portal</span>
+    </a>
+  </div>
+
+</body>
+</html>

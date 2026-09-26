@@ -69,7 +69,7 @@ if (document.getElementById('loginForm')) {
       
       localStorage.setItem('staff_token', data.data.accessToken);
       localStorage.setItem('staff_user', JSON.stringify(data.data.user));
-      window.location.href = 'console.html';
+      window.location.href = '/staff/console.html';
     } catch (err) {
       errorEl.textContent = err.message;
       errorEl.style.display = 'block';

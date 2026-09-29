@@ -258,7 +258,7 @@ const getMyToken = async (patientId, orgId, serviceId = null) => {
     .populate('serviceId', 'name tokenPrefix avgServiceTimeMinutes')
     .populate('counterId', 'name');
 
-  if (!token) throw new AppError('No active token found for today', 404);
+  if (!token) return null;
 
   // Enrich with queue position
   const position = await getQueuePosition(token._id.toString(), token.orgId.toString(), token.serviceId._id.toString(), token.serviceDate);

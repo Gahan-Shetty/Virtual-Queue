@@ -18,7 +18,7 @@ if (logoutBtn) {
     } catch(e) {}
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
-    window.location.href = 'index.html';
+    window.location.href = '/admin/index.html';
   });
 }
 
@@ -77,7 +77,7 @@ if (loginForm) {
         JSON.stringify(data.data.user)
       );
 
-      window.location.href = 'dashboard.html';
+      window.location.href = '/admin/dashboard.html';
 
     } catch (err) {
       errorEl.textContent = err.message;
@@ -92,7 +92,7 @@ const statTotal = document.getElementById('statTotal');
 
 if (statTotal) {
   if (!token) {
-    window.location.href = 'index.html';
+    window.location.href = '/admin/index.html';
   }
 
   const loadStats = async () => {
@@ -233,7 +233,7 @@ const servicesTableBody =
 if (servicesTableBody) {
 
   if (!token) {
-    window.location.href = 'index.html';
+    window.location.href = '/admin/index.html';
   }
 
   const loadServices = async () => {
@@ -347,7 +347,7 @@ if (servicesTableBody) {
 
 const countersTableBody = document.getElementById('countersTableBody');
 if (countersTableBody) {
-  if (!token) window.location.href = 'index.html';
+  if (!token) window.location.href = '/admin/index.html';
 
   const loadCounters = async () => {
     try {
@@ -416,7 +416,7 @@ if (countersTableBody) {
 
 const staffTableBody = document.getElementById('staffTableBody');
 if (staffTableBody) {
-  if (!token) window.location.href = 'index.html';
+  if (!token) window.location.href = '/admin/index.html';
 
   const loadStaff = async () => {
     try {

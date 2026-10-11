@@ -13,6 +13,36 @@
   </head>
   <body>
     <div id="root"></div>
-    
+    <script>
+      (function() {
+        function updatePatientPortalLinks() {
+          const token = localStorage.getItem('token');
+          if (!token) return;
+
+          const patientLinks = document.querySelectorAll('a[href="/patient/index.html"], a[href="patient/index.html"]');
+          patientLinks.forEach(link => {
+            link.href = '/patient/dashboard.html';
+            const txt = link.textContent.trim();
+            if (txt.includes('Book Token')) {
+              link.innerHTML = 'My Token <span class="text-[14px]">↗</span>';
+            } else if (txt.includes('Patient Portal')) {
+              link.textContent = 'My Token Dashboard';
+            } else if (txt.includes('Book Your Spot Now')) {
+              const span = link.querySelector('span');
+              if (span) span.textContent = 'View Your Token';
+            }
+          });
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', updatePatientPortalLinks);
+        } else {
+          updatePatientPortalLinks();
+        }
+
+        const observer = new MutationObserver(updatePatientPortalLinks);
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+      })();
+    </script>
   </body>
 </html>

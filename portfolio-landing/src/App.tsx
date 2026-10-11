@@ -30,9 +30,9 @@ function App() {
               </div>
               
               <div className="mt-24 md:mt-auto">
-                <a href="/patient/index.html" className="group flex flex-col w-max text-xs tracking-widest uppercase font-medium mt-12 text-accent">
+                <a href={typeof window !== 'undefined' && localStorage.getItem('token') ? '/patient/dashboard.html' : '/patient/index.html'} className="group flex flex-col w-max text-xs tracking-widest uppercase font-medium mt-12 text-accent">
                   <div className="flex items-center gap-2 mb-2">
-                    <span>Book Your Spot Now</span>
+                    <span>{typeof window !== 'undefined' && localStorage.getItem('token') ? 'View Your Token' : 'Book Your Spot Now'}</span>
                     <span className="transform translate-y-0.5 group-hover:translate-x-1 transition-transform">↘</span>
                   </div>
                   <div className="h-[1px] w-full bg-border group-hover:bg-accent transition-colors"></div>

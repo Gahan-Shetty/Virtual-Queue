@@ -1,4 +1,11 @@
 {
+  "name": "virtual-queue",
+  "version": "1.0.0",
+  "scripts": {
+    "start:frontend": "npx serve frontend",
+    "start:backend": "cd backend && npm run dev",
+    "build:landing": "cd frontend/landing-src && npm run build"
+  },
   "devDependencies": {
     "autoprefixer": "^10.6.1",
     "postcss": "^8.5.28",

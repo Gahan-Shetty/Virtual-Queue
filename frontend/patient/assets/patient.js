@@ -26,6 +26,18 @@ const generateUUID = () => {
 // ── Auth Logic (index.html) ────────────────────────────────────────────────
 
 if (document.getElementById('loginForm')) {
+  // If already logged in, route directly to token dashboard so patient can see their token!
+  const urlParams = new URLSearchParams(window.location.search);
+  const isLogout = urlParams.get('logout') === 'true';
+
+  if (isLogout) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('orgSlug');
+  } else if (localStorage.getItem('token')) {
+    window.location.replace('/patient/dashboard.html');
+  }
+
   const loginForm = document.getElementById('loginForm');
   const registerForm = document.getElementById('registerForm');
   const loginCard = document.getElementById('loginCard');
@@ -260,6 +272,13 @@ if (document.getElementById('tokenStatus')) {
       });
       const data = await res.json();
       
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/patient/index.html';
+        return null;
+      }
+
       if (res.status === 404 || (res.ok && !data.data)) {
         document.getElementById('noTokenState').style.display = 'block';
         document.getElementById('activeTokenState').style.display = 'none';
@@ -273,7 +292,9 @@ if (document.getElementById('tokenStatus')) {
     } catch (err) {
       console.error(err);
       if (err.message.includes('token') || err.message.includes('Auth')) {
-         window.location.href = '/patient/index.html';
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/patient/index.html';
       }
     }
   };
@@ -501,3 +522,16 @@ if (document.getElementById('requestForm')) {
     }
   });
 }
+
+// ── Global Patient Logout Button Handler ──────────────────────────────────
+const patientLogoutBtn = document.getElementById('patientLogoutBtn');
+if (patientLogoutBtn) {
+  patientLogoutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('orgSlug');
+    window.location.href = '/patient/index.html?logout=true';
+  });
+}
+
